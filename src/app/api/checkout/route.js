@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import getDb from '@/lib/db';
+import { sql, getDb } from '@/lib/db';
 
 export async function POST(request) {
-  const db = getDb();
+  await getDb();
   const body = await request.json();
   const { cliente_nombre, cliente_email, cliente_telefono, direccion, items, total, metodo_pago } = body;
 
@@ -10,10 +10,8 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Datos incompletos' }, { status: 400 });
   }
 
-  // Simulate payment processing delay
   await new Promise(r => setTimeout(r, 1200));
 
-  // Mock payment validation — reject test cards ending in 0000
   if (metodo_pago?.tipo === 'tarjeta') {
     const numero = (metodo_pago.numero || '').replace(/\s/g, '');
     if (numero.endsWith('0000')) {
@@ -21,15 +19,16 @@ export async function POST(request) {
     }
   }
 
-  const itemsJson = JSON.stringify(items);
-  const result = db.prepare(`
+  const [pedido] = await sql`
     INSERT INTO pedidos (cliente_nombre, cliente_email, cliente_telefono, direccion, items, total, estado)
-    VALUES (?, ?, ?, ?, ?, ?, 'confirmado')
-  `).run(cliente_nombre, cliente_email, cliente_telefono || '', direccion || '', itemsJson, total);
+    VALUES (${cliente_nombre}, ${cliente_email}, ${cliente_telefono || ''},
+            ${direccion || ''}, ${JSON.stringify(items)}, ${total}, 'confirmado')
+    RETURNING id
+  `;
 
   return NextResponse.json({
     ok: true,
-    pedido_id: result.lastInsertRowid,
+    pedido_id: pedido.id,
     mensaje: 'Pago procesado correctamente',
   });
 }
