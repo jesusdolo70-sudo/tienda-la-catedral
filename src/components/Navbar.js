@@ -35,7 +35,7 @@ export default function Navbar() {
         <div className="marquee-track">
           {[...Array(6)].map((_, i) => (
             <span key={i} className="font-raleway text-xs tracking-[0.35em] uppercase mx-8" style={{ color: '#7a5f32' }}>
-              La Catedral &nbsp;·&nbsp; Nueva Colección 2025 &nbsp;·&nbsp; Envío Internacional &nbsp;·&nbsp; Exclusividad Garantizada &nbsp;·&nbsp;
+              Imperial &nbsp;·&nbsp; Nueva Colección 2025 &nbsp;·&nbsp; Envío Internacional &nbsp;·&nbsp; Exclusividad Garantizada &nbsp;·&nbsp;
             </span>
           ))}
         </div>
@@ -44,7 +44,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-20">
         {/* Logo con shimmer dorado */}
         <Link href="/" className="gold-shimmer font-cormorant text-2xl font-light tracking-[0.4em] uppercase">
-          La Catedral
+          Imperial
         </Link>
 
         {/* Navegación */}

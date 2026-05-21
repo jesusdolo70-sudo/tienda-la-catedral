@@ -174,7 +174,7 @@ export default function CategoryScreen({ categoria, onClose }) {
               className="font-cormorant text-sm font-light tracking-[0.4em] uppercase"
               style={{ color: `${meta.accent}80` }}
             >
-              La Catedral
+              Imperial
             </span>
             <span style={{ color: `${meta.accent}30` }} className="text-xs">·</span>
             <span
@@ -388,7 +388,7 @@ export default function CategoryScreen({ categoria, onClose }) {
               onClick={onClose}
               className="font-raleway text-xs tracking-[0.28em] uppercase border border-gray-300 text-gray-500 px-10 py-3.5 hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all duration-300"
             >
-              Volver a La Catedral
+              Volver a Imperial
             </motion.button>
           </motion.div>
         )}

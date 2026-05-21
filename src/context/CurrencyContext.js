@@ -38,7 +38,7 @@ const FALLBACK_RATES = {
   JPY: 0.0376,
 };
 
-const CACHE_KEY = 'catedral_fx_rates';
+const CACHE_KEY = 'imperial_fx_rates';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
 const CurrencyContext = createContext();
@@ -50,7 +50,7 @@ export function CurrencyProvider({ children }) {
 
   // Cargar moneda guardada y tasas al inicio
   useEffect(() => {
-    const savedMoneda = localStorage.getItem('catedral_moneda');
+    const savedMoneda = localStorage.getItem('imperial_moneda');
     if (savedMoneda && CURRENCIES.find(c => c.code === savedMoneda)) {
       setMoneda(savedMoneda);
     }
@@ -90,7 +90,7 @@ export function CurrencyProvider({ children }) {
 
   function cambiarMoneda(code) {
     setMoneda(code);
-    localStorage.setItem('catedral_moneda', code);
+    localStorage.setItem('imperial_moneda', code);
   }
 
   function formatPrecio(precioCOP) {

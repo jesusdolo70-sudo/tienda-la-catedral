@@ -76,7 +76,7 @@ function Catalogo() {
             letterSpacing: '-0.04em',
             lineHeight: 1,
           }}>
-            LC
+            I
           </span>
         </div>
 
@@ -105,7 +105,7 @@ function Catalogo() {
               className="font-cormorant font-light leading-none"
               style={{ fontSize: 'clamp(64px, 12vw, 160px)', color: '#f0ead6', letterSpacing: '0.05em' }}
             >
-              La Catedral
+              Imperial
             </motion.h1>
           </div>
 

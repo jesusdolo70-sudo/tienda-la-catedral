@@ -20,7 +20,7 @@ const raleway = Raleway({
 });
 
 export const metadata = {
-  title: 'La Catedral — Moda de Autor',
+  title: 'Imperial — Moda de Autor',
   description: 'Prendas para quienes definen el lujo con su presencia.',
 };
 
@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
             <footer style={{ borderTop: '1px solid #1e1e1e', background: '#080808' }} className="mt-20 py-14">
               <div className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-6">
                 <p className="gold-shimmer font-cormorant text-3xl font-light tracking-[0.4em] uppercase">
-                  La Catedral
+                  Imperial
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-px" style={{ background: '#c9a96e40' }} />
@@ -49,7 +49,7 @@ export default function RootLayout({ children }) {
                   <div className="w-8 h-px" style={{ background: '#c9a96e40' }} />
                 </div>
                 <p className="font-raleway text-xs tracking-widest uppercase" style={{ color: '#3a3228' }}>
-                  © 2025 La Catedral — Todos los derechos reservados
+                  © 2025 Imperial — Todos los derechos reservados
                 </p>
               </div>
             </footer>
