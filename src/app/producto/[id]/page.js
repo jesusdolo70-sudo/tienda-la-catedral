@@ -82,11 +82,16 @@ export default function ProductoPage() {
           ) : (
             <span className="text-9xl relative z-10">{getCategoryEmoji(producto.categoria)}</span>
           )}
-          {producto.stock < 5 && producto.stock > 0 && (
-            <span
-              className="absolute top-4 left-4 z-20 font-raleway text-xs tracking-[0.3em] uppercase px-3 py-1.5"
-              style={{ background: '#c9a96e', color: '#050505', fontWeight: '600' }}
-            >
+          {producto.exclusivo ? (
+            <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+              <span className="font-raleway text-xs tracking-[0.35em] uppercase px-3 py-1.5"
+                style={{ background: '#080604', border: '1px solid #c9a96e70', color: '#c9a96e' }}>
+                ◆ Solo Imperial
+              </span>
+            </div>
+          ) : producto.stock < 5 && producto.stock > 0 && (
+            <span className="absolute top-4 left-4 z-20 font-raleway text-xs tracking-[0.3em] uppercase px-3 py-1.5"
+              style={{ background: '#c9a96e', color: '#050505', fontWeight: '600' }}>
               Últimas unidades
             </span>
           )}
@@ -106,6 +111,31 @@ export default function ProductoPage() {
           <p className="font-raleway text-sm leading-relaxed mt-4" style={{ color: '#4a3f2e' }}>
             {producto.descripcion}
           </p>
+
+          {/* Bloque exclusividad */}
+          {!!producto.exclusivo && (
+            <div className="mt-6 p-4" style={{ border: '1px solid #2a1f0e', background: '#080604' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-4 h-px" style={{ background: '#c9a96e' }} />
+                <span className="font-raleway text-xs tracking-[0.35em] uppercase" style={{ color: '#c9a96e' }}>
+                  Pieza Exclusiva Imperial
+                </span>
+              </div>
+              <ul className="flex flex-col gap-1.5">
+                {[
+                  `Solo ${producto.stock} unidades en existencia — nunca será reimpresa`,
+                  'Número de serie bordado en hilo de seda en el interior del cuello',
+                  'Certificado de autenticidad Imperial incluido',
+                  'Solo disponible en esta tienda — no se distribuye en ningún otro canal',
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span style={{ color: '#c9a96e50', marginTop: '2px' }}>◆</span>
+                    <span className="font-raleway text-xs leading-relaxed" style={{ color: '#6b5f3a' }}>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="mt-6" style={{ borderTop: '1px solid #1a1a1a', paddingTop: '1.5rem' }}>
             <span className="font-cormorant text-4xl font-light" style={{ color: '#c9a96e' }}>

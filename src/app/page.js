@@ -27,6 +27,45 @@ function GoldDivider({ className = '' }) {
   );
 }
 
+function ExclusivosSection() {
+  const [exclusivos, setExclusivos] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/productos?exclusivo=1')
+      .then(r => r.json())
+      .then(data => setExclusivos(Array.isArray(data) ? data.filter(p => p.exclusivo) : []));
+  }, []);
+
+  if (!exclusivos.length) return null;
+
+  return (
+    <section className="mb-20">
+      {/* Cabecera */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+        className="flex items-center gap-6 mb-3">
+        <div className="w-6 h-px" style={{ background: '#c9a96e' }} />
+        <h2 className="font-cormorant text-4xl font-light" style={{ color: '#f0ead6' }}>Piezas Únicas</h2>
+        <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #c9a96e20, transparent)' }} />
+      </motion.div>
+      <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+        className="font-cormorant text-lg italic mb-10 ml-12" style={{ color: '#4a3f2e' }}>
+        Solo en Imperial. No se distribuye en ningún otro canal.
+      </motion.p>
+
+      {/* Cards con fondo especial */}
+      <div className="relative p-px" style={{ background: 'linear-gradient(135deg, #c9a96e30, transparent 60%)' }}>
+        <div className="p-6" style={{ background: '#06050300' }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {exclusivos.map((p, i) => (
+              <ProductCard key={p.id} producto={p} index={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Catalogo() {
   const searchParams = useSearchParams();
   const [productos, setProductos] = useState([]);
@@ -187,6 +226,9 @@ function Catalogo() {
           <div className="w-px h-8" style={{ background: 'linear-gradient(to bottom, #c9a96e60, transparent)' }} />
         </motion.div>
       </section>
+
+      {/* ══ PIEZAS ÚNICAS ════════════════════════════════════════════════════════ */}
+      <ExclusivosSection />
 
       {/* ══ CATEGORÍAS ════════════════════════════════════════════════════════════ */}
       <section className="mb-20">
