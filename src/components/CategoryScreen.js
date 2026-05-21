@@ -100,8 +100,13 @@ export default function CategoryScreen({ categoria, onClose }) {
   const meta = META[categoria] || DEFAULT_META;
 
   useEffect(() => {
+    const sb = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    document.body.style.paddingRight = `${sb}px`;
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    };
   }, []);
 
   useEffect(() => {
