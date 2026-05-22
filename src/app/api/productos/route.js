@@ -26,17 +26,17 @@ export async function GET(request) {
 export async function POST(request) {
   await getDb();
   const body = await request.json();
-  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen } = body;
+  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo } = body;
 
   if (!nombre || !precio || !categoria) {
     return NextResponse.json({ error: 'Nombre, precio y categoría son requeridos' }, { status: 400 });
   }
 
   const [nuevo] = await sql`
-    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen)
+    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo)
     VALUES (${nombre}, ${descripcion || ''}, ${Number(precio)}, ${categoria},
             ${JSON.stringify(tallas || [])}, ${JSON.stringify(colores || [])},
-            ${Number(stock) || 0}, ${imagen || '/placeholder.jpg'})
+            ${Number(stock) || 0}, ${imagen || '/placeholder.jpg'}, ${exclusivo ? 1 : 0})
     RETURNING *
   `;
   return NextResponse.json(nuevo, { status: 201 });

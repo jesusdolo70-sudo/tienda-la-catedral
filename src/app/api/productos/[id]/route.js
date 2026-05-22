@@ -13,14 +13,15 @@ export async function PUT(request, { params }) {
   await getDb();
   const { id } = await params;
   const body = await request.json();
-  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen } = body;
+  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo } = body;
 
   const [actualizado] = await sql`
     UPDATE productos SET
       nombre = ${nombre}, descripcion = ${descripcion},
       precio = ${Number(precio)}, categoria = ${categoria},
       tallas = ${JSON.stringify(tallas || [])}, colores = ${JSON.stringify(colores || [])},
-      stock = ${Number(stock) || 0}, imagen = ${imagen}
+      stock = ${Number(stock) || 0}, imagen = ${imagen},
+      exclusivo = ${exclusivo ? 1 : 0}
     WHERE id = ${id}
     RETURNING *
   `;
