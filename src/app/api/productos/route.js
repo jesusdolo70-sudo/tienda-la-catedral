@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { sql, getDb } from '@/lib/db';
 
+function parseProducto(p) {
+  return {
+    ...p,
+    imagenes: typeof p.imagenes === 'string' ? JSON.parse(p.imagenes || '[]') : (p.imagenes || []),
+  };
+}
+
 export async function GET(request) {
   await getDb();
   const { searchParams } = new URL(request.url);
@@ -20,24 +27,28 @@ export async function GET(request) {
     productos = await sql`SELECT * FROM productos ORDER BY creado_en DESC`;
   }
 
-  return NextResponse.json(productos);
+  return NextResponse.json(productos.map(parseProducto));
 }
 
 export async function POST(request) {
   await getDb();
   const body = await request.json();
-  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo } = body;
+  const { nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, imagenes, exclusivo } = body;
 
   if (!nombre || !precio || !categoria) {
     return NextResponse.json({ error: 'Nombre, precio y categoría son requeridos' }, { status: 400 });
   }
 
+  // imagenes = [imagen principal] + extras, si no se pasa se construye con la principal
+  const todasImagenes = imagenes?.length ? imagenes : (imagen ? [imagen] : []);
+
   const [nuevo] = await sql`
-    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo)
+    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, imagenes, exclusivo)
     VALUES (${nombre}, ${descripcion || ''}, ${Number(precio)}, ${categoria},
             ${JSON.stringify(tallas || [])}, ${JSON.stringify(colores || [])},
-            ${Number(stock) || 0}, ${imagen || '/placeholder.jpg'}, ${exclusivo ? 1 : 0})
+            ${Number(stock) || 0}, ${imagen || '/placeholder.jpg'},
+            ${JSON.stringify(todasImagenes)}, ${exclusivo ? 1 : 0})
     RETURNING *
   `;
-  return NextResponse.json(nuevo, { status: 201 });
+  return NextResponse.json(parseProducto(nuevo), { status: 201 });
 }

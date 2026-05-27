@@ -1,16 +1,154 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { ShoppingCartIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon, ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function getCategoryEmoji(categoria) {
   const map = { 'Camisetas': '👕', 'Pantalones': '👖', 'Vestidos': '👗', 'Chaquetas': '🧥', 'Sudaderas': '🧸', 'Camisas': '👔' };
   return map[categoria] || '🛍️';
 }
 
+/* ── Galería de imágenes ──────────────────────────────────────────────────── */
+function Galeria({ imagenes, nombre }) {
+  const [idx, setIdx]   = useState(0);
+  const [dir, setDir]   = useState(1); // 1 = derecha, -1 = izquierda
+
+  const ir = useCallback((nuevoIdx) => {
+    setDir(nuevoIdx > idx ? 1 : -1);
+    setIdx(nuevoIdx);
+  }, [idx]);
+
+  const prev = () => ir((idx - 1 + imagenes.length) % imagenes.length);
+  const next = () => ir((idx + 1) % imagenes.length);
+
+  // Navegación con teclado
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === 'ArrowLeft')  prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [idx]);
+
+  const variants = {
+    enter: (d) => ({ x: d > 0 ? 60 : -60, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit:  (d) => ({ x: d > 0 ? -60 : 60, opacity: 0 }),
+  };
+
+  if (!imagenes || imagenes.length === 0) return null;
+
+  return (
+    <div className="flex gap-0 h-full">
+      {/* Miniaturas verticales */}
+      {imagenes.length > 1 && (
+        <div className="hidden md:flex flex-col gap-2 p-3 overflow-y-auto flex-shrink-0"
+          style={{ width: 80, background: '#080808', borderRight: '1px solid #1a1a1a' }}>
+          {imagenes.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => ir(i)}
+              className="relative flex-shrink-0 overflow-hidden transition-all duration-200"
+              style={{
+                width: 56, height: 70,
+                border: i === idx ? '1px solid #c9a96e' : '1px solid #1e1e1e',
+                opacity: i === idx ? 1 : 0.45,
+              }}
+              onMouseEnter={e => { if (i !== idx) e.currentTarget.style.opacity = 0.8; }}
+              onMouseLeave={e => { if (i !== idx) e.currentTarget.style.opacity = 0.45; }}
+            >
+              <img src={src} alt={`${nombre} ${i + 1}`}
+                className="w-full h-full object-cover object-top" />
+              {i === idx && (
+                <div className="absolute inset-0" style={{ boxShadow: 'inset 0 0 0 1px #c9a96e' }} />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Imagen principal */}
+      <div className="relative flex-1 overflow-hidden" style={{ background: '#0a0a0a', minHeight: 480 }}>
+        {/* Gradiente de lujo */}
+        <div className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at center, transparent 50%, #080808 100%)' }} />
+
+        <AnimatePresence mode="wait" custom={dir}>
+          <motion.img
+            key={idx}
+            src={imagenes[idx]}
+            alt={`${nombre} — foto ${idx + 1}`}
+            custom={dir}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        </AnimatePresence>
+
+        {/* Flechas */}
+        {imagenes.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 flex items-center justify-center transition-all"
+              style={{ background: '#08080890', border: '1px solid #2a2416' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#c9a96e60'; e.currentTarget.style.background = '#0d0d0d'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a2416'; e.currentTarget.style.background = '#08080890'; }}
+            >
+              <ChevronLeftIcon className="w-4 h-4" style={{ color: '#c9a96e' }} />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 flex items-center justify-center transition-all"
+              style={{ background: '#08080890', border: '1px solid #2a2416' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#c9a96e60'; e.currentTarget.style.background = '#0d0d0d'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a2416'; e.currentTarget.style.background = '#08080890'; }}
+            >
+              <ChevronRightIcon className="w-4 h-4" style={{ color: '#c9a96e' }} />
+            </button>
+          </>
+        )}
+
+        {/* Puntos indicadores (móvil) */}
+        {imagenes.length > 1 && (
+          <div className="md:hidden absolute bottom-4 left-0 right-0 z-20 flex justify-center gap-2">
+            {imagenes.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => ir(i)}
+                className="transition-all duration-200"
+                style={{
+                  width: i === idx ? 20 : 6,
+                  height: 6,
+                  background: i === idx ? '#c9a96e' : '#3a3228',
+                  borderRadius: 3,
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Contador */}
+        {imagenes.length > 1 && (
+          <div className="absolute bottom-4 right-4 z-20 font-raleway text-xs tracking-wider"
+            style={{ color: '#4a3f2e' }}>
+            {idx + 1} / {imagenes.length}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Página de producto ───────────────────────────────────────────────────── */
 export default function ProductoPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -28,10 +166,12 @@ export default function ProductoPage() {
       .then(r => r.json())
       .then(data => {
         if (!data || data.error) return;
-        const tallas = typeof data.tallas === 'string' ? JSON.parse(data.tallas) : (data.tallas || []);
-        const colores = typeof data.colores === 'string' ? JSON.parse(data.colores) : (data.colores || []);
-        setProducto({ ...data, tallas, colores });
-        if (tallas.length > 0) setTallaSeleccionada(tallas[0]);
+        const tallas   = typeof data.tallas   === 'string' ? JSON.parse(data.tallas)   : (data.tallas   || []);
+        const colores  = typeof data.colores  === 'string' ? JSON.parse(data.colores)  : (data.colores  || []);
+        const imagenes = Array.isArray(data.imagenes) ? data.imagenes
+          : typeof data.imagenes === 'string' ? JSON.parse(data.imagenes || '[]') : [];
+        setProducto({ ...data, tallas, colores, imagenes });
+        if (tallas.length > 0)  setTallaSeleccionada(tallas[0]);
         if (colores.length > 0) setColorSeleccionado(colores[0]);
       });
   }, [id]);
@@ -45,11 +185,15 @@ export default function ProductoPage() {
 
   if (!producto) return (
     <div className="flex items-center justify-center h-96">
-      <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: '#c9a96e', borderTopColor: 'transparent' }} />
+      <div className="w-8 h-8 border-2 rounded-full animate-spin"
+        style={{ borderColor: '#c9a96e', borderTopColor: 'transparent' }} />
     </div>
   );
 
-  const hasImage = producto.imagen && producto.imagen.startsWith('http');
+  // Construir array de imágenes para la galería
+  const galeriaImagenes = producto.imagenes?.length
+    ? producto.imagenes
+    : producto.imagen?.startsWith('http') ? [producto.imagen] : [];
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -58,50 +202,41 @@ export default function ProductoPage() {
         className="flex items-center gap-2 font-raleway text-xs tracking-widest uppercase mb-10 transition-colors"
         style={{ color: '#7a6a54' }}
         onMouseEnter={e => e.currentTarget.style.color = '#c9a96e'}
-        onMouseLeave={e => e.currentTarget.style.color = '#4a3f2e'}
+        onMouseLeave={e => e.currentTarget.style.color = '#7a6a54'}
       >
         <ArrowLeftIcon className="w-4 h-4" /> Volver
       </button>
 
       <div className="grid md:grid-cols-2 gap-0 overflow-hidden" style={{ border: '1px solid #1a1a1a' }}>
-        {/* Imagen */}
-        <div
-          className="relative flex items-center justify-center overflow-hidden"
-          style={{ background: '#0a0a0a', minHeight: '480px' }}
-        >
-          <div
-            className="absolute inset-0 z-10"
-            style={{ background: 'radial-gradient(ellipse at center, transparent 55%, #080808 100%)' }}
-          />
-          {hasImage ? (
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="absolute inset-0 w-full h-full object-cover object-top"
-            />
+
+        {/* ── Galería ── */}
+        <div className="relative overflow-hidden" style={{ minHeight: 480 }}>
+          {galeriaImagenes.length > 0 ? (
+            <Galeria imagenes={galeriaImagenes} nombre={producto.nombre} />
           ) : (
-            <span className="text-9xl relative z-10">{getCategoryEmoji(producto.categoria)}</span>
+            <div className="flex items-center justify-center h-full" style={{ background: '#0a0a0a', minHeight: 480 }}>
+              <span className="text-9xl">{getCategoryEmoji(producto.categoria)}</span>
+            </div>
           )}
+
+          {/* Badges */}
           {producto.exclusivo ? (
-            <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+            <div className="absolute top-4 left-[84px] md:left-[88px] z-30">
               <span className="font-raleway text-xs tracking-[0.35em] uppercase px-3 py-1.5"
                 style={{ background: '#080604', border: '1px solid #c9a96e70', color: '#c9a96e' }}>
                 ◆ Solo Imperial
               </span>
             </div>
           ) : producto.stock < 5 && producto.stock > 0 && (
-            <span className="absolute top-4 left-4 z-20 font-raleway text-xs tracking-[0.3em] uppercase px-3 py-1.5"
+            <span className="absolute top-4 left-[84px] md:left-[88px] z-30 font-raleway text-xs tracking-[0.3em] uppercase px-3 py-1.5"
               style={{ background: '#c9a96e', color: '#050505', fontWeight: '600' }}>
               Últimas unidades
             </span>
           )}
         </div>
 
-        {/* Detalle */}
-        <div
-          className="p-10 flex flex-col"
-          style={{ background: '#0d0d0d', borderLeft: '1px solid #1a1a1a' }}
-        >
+        {/* ── Detalle ── */}
+        <div className="p-10 flex flex-col" style={{ background: '#0d0d0d', borderLeft: '1px solid #1a1a1a' }}>
           <span className="font-raleway text-xs tracking-[0.35em] uppercase" style={{ color: '#7a6a54' }}>
             {producto.categoria}
           </span>
@@ -158,8 +293,7 @@ export default function ProductoPage() {
                     className="px-4 py-2 font-raleway text-xs tracking-wider transition-all"
                     style={tallaSeleccionada === t
                       ? { background: '#c9a96e', color: '#080808', border: '1px solid #c9a96e' }
-                      : { background: 'transparent', color: '#6b5f4a', border: '1px solid #2a2416' }
-                    }
+                      : { background: 'transparent', color: '#6b5f4a', border: '1px solid #2a2416' }}
                   >
                     {t}
                   </button>
@@ -182,8 +316,7 @@ export default function ProductoPage() {
                     className="px-3 py-1.5 font-raleway text-xs tracking-wider transition-all"
                     style={colorSeleccionado === c
                       ? { background: '#1a140a', color: '#c9a96e', border: '1px solid #c9a96e' }
-                      : { background: 'transparent', color: '#6b5f4a', border: '1px solid #2a2416' }
-                    }
+                      : { background: 'transparent', color: '#6b5f4a', border: '1px solid #2a2416' }}
                   >
                     {c}
                   </button>
@@ -221,16 +354,13 @@ export default function ProductoPage() {
             className="mt-8 flex items-center justify-center gap-3 py-4 px-6 font-raleway text-xs tracking-[0.35em] uppercase transition-all disabled:opacity-50"
             style={agregado
               ? { background: '#1a2e1a', color: '#4a9a4a', border: '1px solid #2a4a2a' }
-              : { background: '#c9a96e', color: '#080808', border: '1px solid #c9a96e' }
-            }
+              : { background: '#c9a96e', color: '#080808', border: '1px solid #c9a96e' }}
             onMouseEnter={e => { if (!agregado && producto.stock > 0) e.currentTarget.style.background = '#b8945a'; }}
             onMouseLeave={e => { if (!agregado && producto.stock > 0) e.currentTarget.style.background = '#c9a96e'; }}
           >
-            {agregado ? (
-              <><CheckCircleIcon className="w-5 h-5" /> Agregado al carrito</>
-            ) : (
-              <><ShoppingCartIcon className="w-5 h-5" /> Agregar al carrito</>
-            )}
+            {agregado
+              ? <><CheckCircleIcon className="w-5 h-5" /> Agregado al carrito</>
+              : <><ShoppingCartIcon className="w-5 h-5" /> Agregar al carrito</>}
           </button>
         </div>
       </div>

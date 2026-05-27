@@ -22,7 +22,7 @@ const ESTADO_STYLES = {
 
 const PRODUCTO_VACIO = {
   nombre: '', descripcion: '', precio: '', categoria: 'Camisetas',
-  tallas: '', colores: '', stock: '', imagen: '', exclusivo: 0,
+  tallas: '', colores: '', stock: '', imagen: '', imagenes_extra: '', exclusivo: 0,
 };
 
 function GoldDivider() {
@@ -93,9 +93,19 @@ export default function AdminPage() {
 
   function abrirModal(producto = null) {
     if (producto) {
-      const tallas = typeof producto.tallas === 'string' ? JSON.parse(producto.tallas) : producto.tallas;
-      const colores = typeof producto.colores === 'string' ? JSON.parse(producto.colores) : producto.colores;
-      setForm({ ...producto, tallas: tallas.join(', '), colores: colores.join(', '), exclusivo: producto.exclusivo ?? 0 });
+      const tallas  = typeof producto.tallas  === 'string' ? JSON.parse(producto.tallas)  : (producto.tallas  || []);
+      const colores = typeof producto.colores === 'string' ? JSON.parse(producto.colores) : (producto.colores || []);
+      const imagenes = Array.isArray(producto.imagenes) ? producto.imagenes
+        : typeof producto.imagenes === 'string' ? JSON.parse(producto.imagenes || '[]') : [];
+      // imagenes_extra = todas excepto la principal
+      const extras = imagenes.filter(url => url !== producto.imagen);
+      setForm({
+        ...producto,
+        tallas: tallas.join(', '),
+        colores: colores.join(', '),
+        imagenes_extra: extras.join('\n'),
+        exclusivo: producto.exclusivo ?? 0,
+      });
       setEditando(producto.id);
     } else {
       setForm(PRODUCTO_VACIO);
@@ -107,6 +117,12 @@ export default function AdminPage() {
   async function guardarProducto(e) {
     e.preventDefault();
     setGuardando(true);
+    // Construir array completo de imágenes: [principal, ...extras]
+    const extras = (form.imagenes_extra || '').split('\n')
+      .map(s => s.trim()).filter(s => s.startsWith('http'));
+    const todasImagenes = form.imagen
+      ? [form.imagen, ...extras]
+      : extras;
     const body = {
       ...form,
       precio: Number(form.precio),
@@ -114,6 +130,7 @@ export default function AdminPage() {
       exclusivo: form.exclusivo ? 1 : 0,
       tallas: form.tallas.split(',').map(s => s.trim()).filter(Boolean),
       colores: form.colores.split(',').map(s => s.trim()).filter(Boolean),
+      imagenes: todasImagenes,
     };
     const url = editando ? `/api/productos/${editando}` : '/api/productos';
     const method = editando ? 'PUT' : 'POST';
@@ -456,13 +473,21 @@ export default function AdminPage() {
                   style={{ borderBottom: '1px solid #141414', background: i % 2 === 0 ? '#0a0a0a' : '#080808',
                     gridTemplateColumns: '56px 1fr 100px 80px 70px 70px 80px' }}>
 
-                  {/* Thumbnail */}
-                  <div className="w-10 h-10 overflow-hidden flex-shrink-0"
+                  {/* Thumbnail + contador de fotos */}
+                  <div className="relative w-10 h-10 overflow-hidden flex-shrink-0"
                     style={{ border: '1px solid #1e1e1e' }}>
                     {p.imagen ? (
-                      <img src={p.imagen} alt="" className="w-full h-full object-cover" />
+                      <img src={p.imagen} alt="" className="w-full h-full object-cover object-top" />
                     ) : (
                       <div className="w-full h-full" style={{ background: '#1a1a1a' }} />
+                    )}
+                    {p.imagenes?.length > 1 && (
+                      <div className="absolute bottom-0 right-0 flex items-center justify-center"
+                        style={{ background: '#c9a96e', width: 14, height: 14 }}>
+                        <span style={{ color: '#050505', fontSize: 8, fontWeight: 700, lineHeight: 1 }}>
+                          {p.imagenes.length}
+                        </span>
+                      </div>
                     )}
                   </div>
 
@@ -689,19 +714,49 @@ export default function AdminPage() {
                     placeholder="Negro, Blanco, Gris" />
                 </FormField>
 
-                {/* Imagen URL */}
-                <FormField label="URL de imagen">
+                {/* Imagen principal URL */}
+                <FormField label="Imagen principal (URL)">
                   <input type="text" value={form.imagen}
                     onChange={e => setForm(f => ({ ...f, imagen: e.target.value }))}
-                    placeholder="https://..." />
+                    placeholder="https://images.unsplash.com/..." />
                 </FormField>
 
-                {/* Preview imagen */}
+                {/* Preview imagen principal */}
                 {form.imagen && (
                   <div className="w-full h-32 overflow-hidden" style={{ border: '1px solid #1e1e1e' }}>
-                    <img src={form.imagen} alt="" className="w-full h-full object-cover" />
+                    <img src={form.imagen} alt="" className="w-full h-full object-cover object-top" />
                   </div>
                 )}
+
+                {/* Fotos adicionales */}
+                <FormField label="Fotos adicionales (una URL por línea)">
+                  <textarea
+                    rows={4}
+                    value={form.imagenes_extra}
+                    onChange={e => setForm(f => ({ ...f, imagenes_extra: e.target.value }))}
+                    placeholder={'https://images.unsplash.com/...\nhttps://images.unsplash.com/...\nhttps://images.unsplash.com/...'}
+                    style={{ fontFamily: 'monospace', fontSize: '11px' }}
+                  />
+                </FormField>
+
+                {/* Previews de fotos adicionales */}
+                {form.imagenes_extra && (() => {
+                  const urls = form.imagenes_extra.split('\n').map(s => s.trim()).filter(s => s.startsWith('http'));
+                  return urls.length > 0 ? (
+                    <div className="flex gap-2 flex-wrap">
+                      {urls.map((url, i) => (
+                        <div key={i} className="relative overflow-hidden flex-shrink-0"
+                          style={{ width: 56, height: 70, border: '1px solid #1e1e1e' }}>
+                          <img src={url} alt="" className="w-full h-full object-cover object-top" />
+                          <div className="absolute bottom-0 left-0 right-0 text-center"
+                            style={{ background: '#00000080', padding: '2px 0' }}>
+                            <span style={{ color: '#c9a96e', fontSize: 9 }}>{i + 2}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null;
+                })()}
 
                 {/* Exclusivo toggle */}
                 <div className="flex items-center justify-between px-4 py-3"
