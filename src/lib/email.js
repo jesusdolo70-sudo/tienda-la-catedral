@@ -177,7 +177,7 @@ export async function enviarConfirmacionPedido({ pedidoId, clienteNombre, client
   const trackingUrl = `${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/pedidos/${pedidoId}`;
 
   const { data, error } = await getResend().emails.send({
-    from: 'Imperial <onboarding@resend.dev>',
+    from: process.env.RESEND_FROM || 'Imperial <onboarding@resend.dev>',
     to: clienteEmail,
     subject: `Pedido #${pedidoId} confirmado — Imperial`,
     html: emailTemplate({ pedidoId, clienteNombre, items, total, direccion, trackingUrl }),

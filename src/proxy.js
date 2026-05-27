@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 const COOKIE = 'imperial_admin';
 const SECRET = process.env.ADMIN_PASSWORD || 'imperial2025';
 
-export function middleware(request) {
+export function proxy(request) {
   const { pathname } = request.nextUrl;
 
   // Solo protege rutas /admin, excepto /admin/login y la API de login
