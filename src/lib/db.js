@@ -132,11 +132,14 @@ async function initDb() {
         tallas TEXT DEFAULT '[]',
         colores TEXT DEFAULT '[]',
         imagen TEXT DEFAULT '/placeholder.jpg',
+        imagenes TEXT DEFAULT '[]',
         stock INTEGER DEFAULT 0,
         exclusivo INTEGER DEFAULT 0,
         creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+    // Migración: agregar columnas que puedan no existir en tablas antiguas
+    await sql`ALTER TABLE productos ADD COLUMN IF NOT EXISTS imagenes TEXT DEFAULT '[]'`;
     await sql`
       CREATE TABLE IF NOT EXISTS pedidos (
         id SERIAL PRIMARY KEY,
@@ -164,6 +167,7 @@ async function initDb() {
         tallas TEXT DEFAULT '[]',
         colores TEXT DEFAULT '[]',
         imagen TEXT DEFAULT '/placeholder.jpg',
+        imagenes TEXT DEFAULT '[]',
         stock INTEGER DEFAULT 0,
         exclusivo INTEGER DEFAULT 0,
         creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -180,6 +184,8 @@ async function initDb() {
         creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
+    // Migración local: agregar columna imagenes si no existe
+    try { db.exec(`ALTER TABLE productos ADD COLUMN imagenes TEXT DEFAULT '[]'`); } catch {}
     const row = db.prepare('SELECT COUNT(*) as c FROM productos').get();
     if (row.c === 0) seedLocal(db);
   }
@@ -187,18 +193,21 @@ async function initDb() {
 
 async function seedProd() {
   for (const [nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo] of SEED) {
+    const imagenes = JSON.stringify([imagen]);
     await sql`
-      INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo)
-      VALUES (${nombre}, ${descripcion}, ${precio}, ${categoria}, ${tallas}, ${colores}, ${stock}, ${imagen}, ${exclusivo ?? 0})
+      INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, imagenes, exclusivo)
+      VALUES (${nombre}, ${descripcion}, ${precio}, ${categoria}, ${tallas}, ${colores}, ${stock}, ${imagen}, ${imagenes}, ${exclusivo ?? 0})
     `;
   }
 }
 
 function seedLocal(db) {
   const stmt = db.prepare(`
-    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO productos (nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, imagenes, exclusivo)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
-  for (const [nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo] of SEED)
-    stmt.run(nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo ?? 0);
+  for (const [nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, exclusivo] of SEED) {
+    const imagenes = JSON.stringify([imagen]);
+    stmt.run(nombre, descripcion, precio, categoria, tallas, colores, stock, imagen, imagenes, exclusivo ?? 0);
+  }
 }
