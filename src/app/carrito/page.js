@@ -19,7 +19,7 @@ export default function CarritoPage() {
     <div className="text-center py-20">
       <p className="font-cormorant text-6xl mb-6" style={{ color: '#c9a96e' }}>∅</p>
       <h2 className="font-cormorant text-3xl font-light mb-3" style={{ color: '#f0ead6' }}>Tu carrito está vacío</h2>
-      <p className="font-raleway text-xs tracking-widest uppercase mb-10" style={{ color: '#4a3f2e' }}>Agrega productos para continuar</p>
+      <p className="font-raleway text-xs tracking-widest uppercase mb-10" style={{ color: '#7a6a54' }}>Agrega productos para continuar</p>
       <Link
         href="/"
         className="font-raleway text-xs tracking-[0.3em] uppercase px-8 py-3 transition-colors"
@@ -35,7 +35,7 @@ export default function CarritoPage() {
       <button
         onClick={() => router.back()}
         className="flex items-center gap-2 font-raleway text-xs tracking-widest uppercase mb-10 transition-colors"
-        style={{ color: '#4a3f2e' }}
+        style={{ color: '#7a6a54' }}
         onMouseEnter={e => e.currentTarget.style.color = '#c9a96e'}
         onMouseLeave={e => e.currentTarget.style.color = '#4a3f2e'}
       >
@@ -63,7 +63,7 @@ export default function CarritoPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-cormorant text-lg font-medium truncate" style={{ color: '#f0ead6' }}>{item.nombre}</p>
-                <p className="font-raleway text-xs tracking-wider" style={{ color: '#4a3f2e' }}>{item.talla} · {item.color}</p>
+                <p className="font-raleway text-xs tracking-wider" style={{ color: '#7a6a54' }}>{item.talla} · {item.color}</p>
                 <p className="font-cormorant text-lg mt-1" style={{ color: '#c9a96e' }}>{formatPrecio(item.precio)}</p>
               </div>
               <div className="flex items-center" style={{ border: '1px solid #2a2416' }}>
@@ -101,7 +101,7 @@ export default function CarritoPage() {
           <div className="p-6" style={{ background: '#0d0d0d', border: '1px solid #1a1a1a' }}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-cormorant text-xl font-light" style={{ color: '#f0ead6' }}>Resumen</h3>
-              <span className="font-raleway text-xs tracking-wider" style={{ color: '#4a3f2e' }}>
+              <span className="font-raleway text-xs tracking-wider" style={{ color: '#7a6a54' }}>
                 {monedaInfo.flag} {monedaInfo.code}
               </span>
             </div>

@@ -8,13 +8,27 @@ import { Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CATEGORIAS = [
-  { nombre: 'Camisetas',  emoji: '👕', sub: 'Básicos de autor' },
-  { nombre: 'Pantalones', emoji: '👖', sub: 'Siluetas de precisión' },
-  { nombre: 'Vestidos',   emoji: '👗', sub: 'Elegancia sin límites' },
-  { nombre: 'Chaquetas',  emoji: '🧥', sub: 'Capas con carácter' },
-  { nombre: 'Sudaderas',  emoji: '🧸', sub: 'Confort de autor' },
-  { nombre: 'Camisas',    emoji: '👔', sub: 'Formalidad redefinida' },
+  { nombre: 'Camisetas',  sub: 'Básicos de autor' },
+  { nombre: 'Pantalones', sub: 'Siluetas de precisión' },
+  { nombre: 'Vestidos',   sub: 'Elegancia sin límites' },
+  { nombre: 'Chaquetas',  sub: 'Capas con carácter' },
+  { nombre: 'Sudaderas',  sub: 'Confort de autor' },
+  { nombre: 'Camisas',    sub: 'Formalidad redefinida' },
 ];
+
+const CATEGORIAS_FILTRO = ['Todas', 'Camisetas', 'Pantalones', 'Vestidos', 'Chaquetas', 'Sudaderas', 'Camisas'];
+
+function CategoryIcon({ nombre }) {
+  const p = { fill: 'none', stroke: 'currentColor', strokeWidth: '1.5', strokeLinecap: 'round', strokeLinejoin: 'round' };
+  const s = { width: 38, height: 38, viewBox: '0 0 24 24', ...p };
+  if (nombre === 'Camisetas')  return <svg {...s}><path d="M9 3C9.5 5 10.5 5.5 12 5.5C13.5 5.5 14.5 5 15 3L21 5.5L19.5 8.5L17 7.5V20H7V7.5L4.5 8.5L3 5.5Z"/></svg>;
+  if (nombre === 'Pantalones') return <svg {...s}><path d="M5 3H19L21 12H15.5L13 21H11L8.5 12H3Z"/></svg>;
+  if (nombre === 'Vestidos')   return <svg {...s}><path d="M9 3H15L16 9L21 21H3L8 9Z"/><path d="M9 3C9.5 4.5 10.5 5 12 5C13.5 5 14.5 4.5 15 3"/></svg>;
+  if (nombre === 'Chaquetas')  return <svg {...s}><path d="M3 8L7.5 3L11 6V15L12 16L13 15V6L16.5 3L21 8L19 10L17 9V21H7V9L5 10Z"/></svg>;
+  if (nombre === 'Sudaderas')  return <svg {...s}><path d="M8 5C6.5 5 5.5 6 5.5 7.5L2 9.5L3.5 13L6 11.5V21H18V11.5L20.5 13L22 9.5L18.5 7.5C18.5 6 17.5 5 16 5C14.5 5 13.5 6.5 12 6.5C10.5 6.5 9.5 5 8 5Z"/></svg>;
+  if (nombre === 'Camisas')    return <svg {...s}><path d="M8 3L3 7L5.5 10L8 8.5V21H16V8.5L18.5 10L21 7L16 3L13.5 5.5C13 6 11 6 10.5 5.5Z"/><path d="M10.5 5.5L12 3L13.5 5.5"/></svg>;
+  return null;
+}
 
 // Divisor ornamental dorado
 function GoldDivider({ className = '' }) {
@@ -48,7 +62,7 @@ function ExclusivosSection() {
         <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #c9a96e20, transparent)' }} />
       </motion.div>
       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-        className="font-cormorant text-lg italic mb-10 ml-12" style={{ color: '#4a3f2e' }}>
+        className="font-cormorant text-lg italic mb-10 ml-12" style={{ color: '#7a6a54' }}>
         Solo en Imperial. No se distribuye en ningún otro canal.
       </motion.p>
 
@@ -70,6 +84,7 @@ function Catalogo() {
   const searchParams = useSearchParams();
   const [productos, setProductos] = useState([]);
   const [buscar, setBuscar] = useState('');
+  const [categoriaFiltro, setCategoriaFiltro] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
 
@@ -82,10 +97,11 @@ function Catalogo() {
     setCargando(true);
     const params = new URLSearchParams();
     if (buscar) params.set('buscar', buscar);
+    if (categoriaFiltro) params.set('categoria', categoriaFiltro);
     fetch(`/api/productos?${params}`)
       .then(r => r.json())
       .then(data => { setProductos(data); setCargando(false); });
-  }, [buscar]);
+  }, [buscar, categoriaFiltro]);
 
   return (
     <>
@@ -141,8 +157,8 @@ function Catalogo() {
               initial={{ y: '100%' }}
               animate={{ y: '0%' }}
               transition={{ delay: 0.18, duration: 1, ease: [0.76, 0, 0.24, 1] }}
-              className="font-cormorant font-light leading-none"
-              style={{ fontSize: 'clamp(64px, 12vw, 160px)', color: '#f0ead6', letterSpacing: '0.05em' }}
+              className="font-cinzel"
+              style={{ fontSize: 'clamp(52px, 10vw, 140px)', color: '#f0ead6', letterSpacing: '0.12em', fontWeight: '400' }}
             >
               Imperial
             </motion.h1>
@@ -187,11 +203,11 @@ function Catalogo() {
             <motion.button
               whileHover={{ scale: 1.03, background: '#c9a96e10' }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => setCategoriaAbierta('Vestidos')}
+              onClick={() => document.getElementById('categorias')?.scrollIntoView({ behavior: 'smooth' })}
               className="font-raleway text-xs tracking-[0.3em] uppercase px-10 py-4"
               style={{ border: '1px solid #c9a96e40', color: '#c9a96e' }}
             >
-              Ver Tendencias
+              Ver Categorías
             </motion.button>
           </motion.div>
 
@@ -222,7 +238,7 @@ function Catalogo() {
           transition={{ delay: 1.5, duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="font-raleway text-xs tracking-[0.3em] uppercase" style={{ color: '#4a3f2e' }}>Descubrir</span>
+          <span className="font-raleway text-xs tracking-[0.3em] uppercase" style={{ color: '#6b5f4a' }}>Descubrir</span>
           <div className="w-px h-8" style={{ background: 'linear-gradient(to bottom, #c9a96e60, transparent)' }} />
         </motion.div>
       </section>
@@ -231,7 +247,7 @@ function Catalogo() {
       <ExclusivosSection />
 
       {/* ══ CATEGORÍAS ════════════════════════════════════════════════════════════ */}
-      <section className="mb-20">
+      <section className="mb-20" id="categorias">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -244,7 +260,7 @@ function Catalogo() {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {CATEGORIAS.map(({ nombre, emoji, sub }, i) => (
+          {CATEGORIAS.map(({ nombre, sub }, i) => (
             <motion.button
               key={nombre}
               initial={{ opacity: 0, y: 24 }}
@@ -253,7 +269,7 @@ function Catalogo() {
               whileHover={{ y: -6, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setCategoriaAbierta(nombre)}
-              className="group relative flex flex-col items-center gap-3 py-8 px-4 overflow-hidden"
+              className="group relative flex flex-col items-center gap-4 py-8 px-4 overflow-hidden"
               style={{ background: '#0d0d0d', border: '1px solid #1e1e1e' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#c9a96e40'; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = '#1e1e1e'; }}
@@ -266,15 +282,19 @@ function Catalogo() {
               <div className="absolute top-0 left-0 right-0 h-px scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
                 style={{ background: '#c9a96e' }}
               />
-              <span className="text-3xl relative z-10">{emoji}</span>
+              <div className="relative z-10 opacity-40 group-hover:opacity-100 transition-opacity duration-400"
+                style={{ color: '#c9a96e' }}
+              >
+                <CategoryIcon nombre={nombre} />
+              </div>
               <div className="relative z-10 text-center">
                 <p className="font-raleway text-xs tracking-[0.2em] uppercase font-medium transition-colors duration-300"
                   style={{ color: '#6b5f4a' }}
                 >
                   {nombre}
                 </p>
-                <p className="font-cormorant text-xs italic mt-0.5 transition-colors duration-300"
-                  style={{ color: '#3a3228' }}
+                <p className="font-cormorant text-sm italic mt-0.5 transition-colors duration-300"
+                  style={{ color: '#5a4f3a' }}
                 >
                   {sub}
                 </p>
@@ -291,6 +311,26 @@ function Catalogo() {
           <div className="w-6 h-px" style={{ background: '#c9a96e' }} />
           <h2 className="font-cormorant text-4xl font-light" style={{ color: '#f0ead6' }}>Toda la Colección</h2>
           <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #c9a96e20, transparent)' }} />
+        </div>
+
+        {/* Filtros por categoría */}
+        <div className="flex gap-2 flex-wrap mb-6">
+          {CATEGORIAS_FILTRO.map(cat => {
+            const activo = (cat === 'Todas' && !categoriaFiltro) || cat === categoriaFiltro;
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategoriaFiltro(cat === 'Todas' ? null : cat)}
+                className="font-raleway text-xs tracking-[0.2em] uppercase px-4 py-2 transition-all"
+                style={activo
+                  ? { background: '#c9a96e', color: '#080808' }
+                  : { border: '1px solid #2a2416', color: '#6b5f4a' }
+                }
+              >
+                {cat}
+              </button>
+            );
+          })}
         </div>
 
         {/* Buscador oscuro */}

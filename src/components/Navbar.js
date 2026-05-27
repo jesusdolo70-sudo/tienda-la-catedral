@@ -43,7 +43,7 @@ export default function Navbar() {
 
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-20">
         {/* Logo con shimmer dorado */}
-        <Link href="/" className="gold-shimmer font-cormorant text-2xl font-light tracking-[0.4em] uppercase">
+        <Link href="/" className="gold-shimmer font-cinzel text-xl tracking-[0.35em] uppercase">
           Imperial
         </Link>
 

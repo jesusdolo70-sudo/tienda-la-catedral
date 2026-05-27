@@ -1,10 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function AdminLogin() {
-  const router = useRouter();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -21,8 +19,8 @@ export default function AdminLogin() {
     });
 
     if (res.ok) {
-      router.push('/admin');
-      router.refresh();
+      window.location.replace('/admin');
+      return;
     } else {
       setError('Contraseña incorrecta');
       setPassword('');

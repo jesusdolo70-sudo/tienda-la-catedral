@@ -3,13 +3,18 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PlusIcon, PencilIcon, TrashIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
+} from 'recharts';
 
 const CATEGORIAS = ['Camisetas', 'Pantalones', 'Vestidos', 'Chaquetas', 'Sudaderas', 'Camisas', 'Zapatos', 'Accesorios'];
-const ESTADOS = ['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'];
+const ESTADOS = ['pendiente', 'confirmado', 'preparando', 'enviado', 'entregado', 'cancelado'];
 
 const ESTADO_STYLES = {
   pendiente:   { bg: '#2a1a00', text: '#f59e0b', border: '#f59e0b30' },
   confirmado:  { bg: '#001a2a', text: '#38bdf8', border: '#38bdf830' },
+  preparando:  { bg: '#1a1000', text: '#c9a96e', border: '#c9a96e30' },
   enviado:     { bg: '#0d1a2a', text: '#818cf8', border: '#818cf830' },
   entregado:   { bg: '#001a0a', text: '#4ade80', border: '#4ade8030' },
   cancelado:   { bg: '#1a0000', text: '#f87171', border: '#f8717130' },
@@ -56,6 +61,9 @@ export default function AdminPage() {
   const [form, setForm] = useState(PRODUCTO_VACIO);
   const [guardando, setGuardando] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [statsDias, setStatsDias] = useState(7);
+  const [graficaTipo, setGraficaTipo] = useState('ingresos');
 
   async function cerrarSesion() {
     await fetch('/api/admin/login', { method: 'DELETE' });
@@ -65,7 +73,13 @@ export default function AdminPage() {
   useEffect(() => {
     cargarProductos();
     cargarPedidos();
+    cargarStats(7);
   }, []);
+
+  async function cargarStats(dias) {
+    const data = await fetch(`/api/admin/stats?dias=${dias}`).then(r => r.json());
+    setStats(data);
+  }
 
   async function cargarProductos() {
     const data = await fetch('/api/productos').then(r => r.json());
@@ -227,6 +241,145 @@ export default function AdminPage() {
                 style={{ color: '#f59e0b80' }}>
                 ver →
               </button>
+            </motion.div>
+          )}
+
+          {/* ── GRÁFICA DE VENTAS ──────────────────────────────────────────────── */}
+          {stats && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="mb-6 p-6"
+              style={{ background: '#0d0d0d', border: '1px solid #1e1e1e' }}
+            >
+              {/* Cabecera */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-4 h-px" style={{ background: '#c9a96e' }} />
+                  <h2 className="font-cormorant text-2xl font-light" style={{ color: '#f0ead6' }}>Ventas</h2>
+                </div>
+                <div className="flex items-center gap-3">
+                  {/* Tipo de dato */}
+                  <div className="flex" style={{ border: '1px solid #1e1e1e' }}>
+                    {[{ id: 'ingresos', label: 'Ingresos' }, { id: 'pedidos', label: 'Pedidos' }].map(op => (
+                      <button
+                        key={op.id}
+                        onClick={() => setGraficaTipo(op.id)}
+                        className="px-3 py-1.5 font-raleway text-xs tracking-wider transition-colors"
+                        style={graficaTipo === op.id
+                          ? { background: '#c9a96e20', color: '#c9a96e' }
+                          : { color: '#4a3f2e' }}
+                      >
+                        {op.label}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Rango de días */}
+                  <div className="flex" style={{ border: '1px solid #1e1e1e' }}>
+                    {[7, 14, 30].map(d => (
+                      <button
+                        key={d}
+                        onClick={() => { setStatsDias(d); cargarStats(d); }}
+                        className="px-3 py-1.5 font-raleway text-xs tracking-wider transition-colors"
+                        style={statsDias === d
+                          ? { background: '#c9a96e20', color: '#c9a96e' }
+                          : { color: '#4a3f2e' }}
+                      >
+                        {d}d
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Mini stats del período */}
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {[
+                  { label: 'Ingresos del período', value: `$${Math.round(stats.totalPeriodo / 1000)}k` },
+                  { label: 'Pedidos del período',  value: stats.pedidosPeriodo },
+                  { label: 'Mejor día',             value: stats.mejorDia?.label || '—', sub: stats.mejorDia?.ingresos > 0 ? `$${Math.round(stats.mejorDia.ingresos / 1000)}k` : '' },
+                ].map(s => (
+                  <div key={s.label} className="p-3" style={{ background: '#111', border: '1px solid #1a1a1a' }}>
+                    <p className="font-raleway text-xs mb-1" style={{ color: '#3a3228' }}>{s.label}</p>
+                    <p className="font-cormorant text-2xl font-light" style={{ color: '#c9a96e' }}>{s.value}</p>
+                    {s.sub && <p className="font-raleway text-xs" style={{ color: '#4a3f2e' }}>{s.sub}</p>}
+                  </div>
+                ))}
+              </div>
+
+              {/* Chart */}
+              <ResponsiveContainer width="100%" height={220}>
+                <AreaChart data={stats.datos} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="gradOro" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#c9a96e" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#c9a96e" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1a1a1a" vertical={false} />
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: '#3a3228', fontFamily: 'Arial', fontSize: 10 }}
+                    axisLine={false} tickLine={false}
+                    interval={statsDias > 14 ? 4 : statsDias > 7 ? 1 : 0}
+                  />
+                  <YAxis
+                    tick={{ fill: '#3a3228', fontFamily: 'Arial', fontSize: 10 }}
+                    axisLine={false} tickLine={false}
+                    tickFormatter={v => graficaTipo === 'ingresos'
+                      ? (v >= 1000 ? `$${Math.round(v/1000)}k` : `$${v}`)
+                      : v}
+                    width={44}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: '#0d0d0d', border: '1px solid #2a2416', borderRadius: 0 }}
+                    labelStyle={{ color: '#c9a96e', fontFamily: 'Arial', fontSize: 11, marginBottom: 4 }}
+                    itemStyle={{ color: '#f0ead6', fontFamily: 'Arial', fontSize: 12 }}
+                    formatter={v => graficaTipo === 'ingresos'
+                      ? [`$${Number(v).toLocaleString('es-CO')}`, 'Ingresos']
+                      : [v, 'Pedidos']}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey={graficaTipo}
+                    stroke="#c9a96e"
+                    strokeWidth={2}
+                    fill="url(#gradOro)"
+                    dot={false}
+                    activeDot={{ r: 4, fill: '#c9a96e', strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+
+              {/* Categorías más vendidas */}
+              {stats.categorias?.length > 0 && (
+                <div className="mt-6 pt-5" style={{ borderTop: '1px solid #1a1a1a' }}>
+                  <p className="font-raleway text-xs tracking-[0.25em] uppercase mb-4" style={{ color: '#3a3228' }}>
+                    Categorías por ingresos
+                  </p>
+                  <div className="space-y-2">
+                    {stats.categorias.map(cat => {
+                      const max = stats.categorias[0].total;
+                      const pct = max > 0 ? (cat.total / max) * 100 : 0;
+                      return (
+                        <div key={cat.nombre} className="flex items-center gap-3">
+                          <span className="font-raleway text-xs w-24 flex-shrink-0" style={{ color: '#6b5f4a' }}>{cat.nombre}</span>
+                          <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: '#1a1a1a' }}>
+                            <div
+                              className="h-full transition-all duration-700"
+                              style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #c9a96e, #8a6832)' }}
+                            />
+                          </div>
+                          <span className="font-raleway text-xs w-16 text-right flex-shrink-0" style={{ color: '#4a3f2e' }}>
+                            ${Math.round(cat.total / 1000)}k
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 

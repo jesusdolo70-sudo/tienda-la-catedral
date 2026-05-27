@@ -1,8 +1,9 @@
 import { CartProvider } from '@/context/CartContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import PageTransition from '@/components/PageTransition';
-import { Cormorant_Garamond, Raleway } from 'next/font/google';
+import { Cormorant_Garamond, Raleway, Cinzel } from 'next/font/google';
 import './globals.css';
 
 const cormorant = Cormorant_Garamond({
@@ -19,6 +20,13 @@ const raleway = Raleway({
   display: 'swap',
 });
 
+const cinzel = Cinzel({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-cinzel',
+  display: 'swap',
+});
+
 export const metadata = {
   title: 'Imperial — Moda de Autor',
   description: 'Prendas para quienes definen el lujo con su presencia.',
@@ -26,7 +34,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es" className={`${cormorant.variable} ${raleway.variable}`}>
+    <html lang="es" className={`${cormorant.variable} ${raleway.variable} ${cinzel.variable}`}>
       <body style={{ background: '#050505' }}>
         <CurrencyProvider>
           <CartProvider>
@@ -35,24 +43,7 @@ export default function RootLayout({ children }) {
               <PageTransition>{children}</PageTransition>
             </main>
 
-            {/* Footer de lujo */}
-            <footer style={{ borderTop: '1px solid #1e1e1e', background: '#080808' }} className="mt-20 py-14">
-              <div className="max-w-7xl mx-auto px-8 flex flex-col items-center gap-6">
-                <p className="gold-shimmer font-cormorant text-3xl font-light tracking-[0.4em] uppercase">
-                  Imperial
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-px" style={{ background: '#c9a96e40' }} />
-                  <span className="text-xs font-raleway tracking-[0.35em] uppercase" style={{ color: '#7a5f32' }}>
-                    Moda · Exclusividad · Presencia
-                  </span>
-                  <div className="w-8 h-px" style={{ background: '#c9a96e40' }} />
-                </div>
-                <p className="font-raleway text-xs tracking-widest uppercase" style={{ color: '#3a3228' }}>
-                  © 2025 Imperial — Todos los derechos reservados
-                </p>
-              </div>
-            </footer>
+            <Footer />
           </CartProvider>
         </CurrencyProvider>
       </body>

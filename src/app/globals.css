@@ -3,6 +3,7 @@
 @theme {
   --font-cormorant: var(--font-cormorant);
   --font-raleway: var(--font-raleway);
+  --font-cinzel: var(--font-cinzel);
 }
 
 /* ── Variables de lujo ──────────────────────────────── */
@@ -33,6 +34,7 @@ body {
 
 .font-cormorant { font-family: var(--font-cormorant), 'Cormorant Garamond', serif; }
 .font-raleway   { font-family: var(--font-raleway), 'Raleway', sans-serif; }
+.font-cinzel    { font-family: var(--font-cinzel), 'Cinzel', serif; }
 
 h1, h2, h3 { font-family: var(--font-cormorant), 'Cormorant Garamond', serif; }
 

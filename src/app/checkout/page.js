@@ -291,15 +291,26 @@ export default function CheckoutPage() {
       <p className="font-raleway text-xs tracking-wider mb-10" style={{ color: '#3a3228' }}>
         Recibirás un correo en {shipping.email}
       </p>
-      <Link
-        href="/"
-        className="font-raleway text-xs tracking-[0.3em] uppercase px-10 py-3 transition-all"
-        style={{ background: '#c9a96e', color: '#080808' }}
-        onMouseEnter={e => e.currentTarget.style.background = '#b8945a'}
-        onMouseLeave={e => e.currentTarget.style.background = '#c9a96e'}
-      >
-        Seguir comprando
-      </Link>
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <Link
+          href={`/pedidos/${pedidoId}`}
+          className="font-raleway text-xs tracking-[0.3em] uppercase px-10 py-3 transition-all"
+          style={{ background: '#c9a96e', color: '#080808' }}
+          onMouseEnter={e => e.currentTarget.style.background = '#b8945a'}
+          onMouseLeave={e => e.currentTarget.style.background = '#c9a96e'}
+        >
+          Rastrear mi pedido →
+        </Link>
+        <Link
+          href="/"
+          className="font-raleway text-xs tracking-[0.3em] uppercase px-10 py-3 transition-all"
+          style={{ border: '1px solid #2a2416', color: '#6b5f4a' }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#c9a96e40'; e.currentTarget.style.color = '#c9a96e'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#2a2416'; e.currentTarget.style.color = '#6b5f4a'; }}
+        >
+          Seguir comprando
+        </Link>
+      </div>
     </div>
   );
 

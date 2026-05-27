@@ -88,13 +88,13 @@ export default function ProductCard({ producto, index = 0 }) {
 
           {/* Info */}
           <div className="p-5 flex flex-col flex-1" style={{ borderTop: `1px solid ${esExclusivo ? '#2a1f0e' : '#1a1a1a'}` }}>
-            <span className="font-raleway text-xs tracking-[0.22em] uppercase mb-1" style={{ color: esExclusivo ? '#7a5f32' : '#4a3f2e' }}>
+            <span className="font-raleway text-xs tracking-[0.22em] uppercase mb-1" style={{ color: esExclusivo ? '#7a5f32' : '#7a6a54' }}>
               {producto.categoria}
             </span>
             <h3 className="font-cormorant text-xl font-medium leading-snug mb-2" style={{ color: '#f0ead6' }}>
               {producto.nombre}
             </h3>
-            <p className="font-raleway text-xs leading-relaxed font-light flex-1 line-clamp-2" style={{ color: '#4a3f2e' }}>
+            <p className="font-raleway text-xs leading-relaxed font-light flex-1 line-clamp-2" style={{ color: '#8a7860' }}>
               {producto.descripcion}
             </p>
 
@@ -118,7 +118,7 @@ export default function ProductCard({ producto, index = 0 }) {
                   Edición única
                 </span>
               ) : (
-                <span className="font-raleway text-xs tracking-wider" style={{ color: '#3a3228' }}>
+                <span className="font-raleway text-xs tracking-wider" style={{ color: '#5a4f3a' }}>
                   {producto.stock} uds.
                 </span>
               )}

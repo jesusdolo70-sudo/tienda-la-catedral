@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { sql, getDb } from '@/lib/db';
+import { enviarConfirmacionPedido } from '@/lib/email';
 
 export async function POST(request) {
   await getDb();
@@ -25,6 +26,16 @@ export async function POST(request) {
             ${direccion || ''}, ${JSON.stringify(items)}, ${total}, 'confirmado')
     RETURNING id
   `;
+
+  // Enviar email en background (no bloquea la respuesta)
+  enviarConfirmacionPedido({
+    pedidoId: pedido.id,
+    clienteNombre: cliente_nombre,
+    clienteEmail: cliente_email,
+    items,
+    total,
+    direccion,
+  }).catch(err => console.error('[Email]', err));
 
   return NextResponse.json({
     ok: true,

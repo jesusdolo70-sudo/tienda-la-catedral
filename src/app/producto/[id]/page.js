@@ -56,7 +56,7 @@ export default function ProductoPage() {
       <button
         onClick={() => router.back()}
         className="flex items-center gap-2 font-raleway text-xs tracking-widest uppercase mb-10 transition-colors"
-        style={{ color: '#4a3f2e' }}
+        style={{ color: '#7a6a54' }}
         onMouseEnter={e => e.currentTarget.style.color = '#c9a96e'}
         onMouseLeave={e => e.currentTarget.style.color = '#4a3f2e'}
       >
@@ -102,13 +102,13 @@ export default function ProductoPage() {
           className="p-10 flex flex-col"
           style={{ background: '#0d0d0d', borderLeft: '1px solid #1a1a1a' }}
         >
-          <span className="font-raleway text-xs tracking-[0.35em] uppercase" style={{ color: '#4a3f2e' }}>
+          <span className="font-raleway text-xs tracking-[0.35em] uppercase" style={{ color: '#7a6a54' }}>
             {producto.categoria}
           </span>
           <h1 className="font-cormorant text-4xl font-light mt-2 leading-tight" style={{ color: '#f0ead6' }}>
             {producto.nombre}
           </h1>
-          <p className="font-raleway text-sm leading-relaxed mt-4" style={{ color: '#4a3f2e' }}>
+          <p className="font-raleway text-sm leading-relaxed mt-4" style={{ color: '#7a6a54' }}>
             {producto.descripcion}
           </p>
 
@@ -149,7 +149,7 @@ export default function ProductoPage() {
           {/* Tallas */}
           {producto.tallas.length > 0 && (
             <div className="mt-6">
-              <p className="font-raleway text-xs tracking-[0.25em] uppercase mb-3" style={{ color: '#4a3f2e' }}>Talla</p>
+              <p className="font-raleway text-xs tracking-[0.25em] uppercase mb-3" style={{ color: '#7a6a54' }}>Talla</p>
               <div className="flex gap-2 flex-wrap">
                 {producto.tallas.map(t => (
                   <button
@@ -171,7 +171,7 @@ export default function ProductoPage() {
           {/* Colores */}
           {producto.colores.length > 0 && (
             <div className="mt-5">
-              <p className="font-raleway text-xs tracking-[0.25em] uppercase mb-3" style={{ color: '#4a3f2e' }}>
+              <p className="font-raleway text-xs tracking-[0.25em] uppercase mb-3" style={{ color: '#7a6a54' }}>
                 Color: <span style={{ color: '#c9a96e' }}>{colorSeleccionado}</span>
               </p>
               <div className="flex gap-2 flex-wrap">
@@ -194,7 +194,7 @@ export default function ProductoPage() {
 
           {/* Cantidad */}
           <div className="mt-6 flex items-center gap-4">
-            <p className="font-raleway text-xs tracking-[0.25em] uppercase" style={{ color: '#4a3f2e' }}>Cantidad</p>
+            <p className="font-raleway text-xs tracking-[0.25em] uppercase" style={{ color: '#7a6a54' }}>Cantidad</p>
             <div className="flex items-center" style={{ border: '1px solid #2a2416' }}>
               <button
                 onClick={() => setCantidad(q => Math.max(1, q - 1))}
