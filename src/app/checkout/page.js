@@ -315,7 +315,7 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto px-4 py-10">
       <button
         onClick={() => step === 0 ? router.push('/carrito') : setStep(s => s - 1)}
         className="flex items-center gap-2 font-raleway text-xs tracking-widest uppercase mb-10 transition-colors"

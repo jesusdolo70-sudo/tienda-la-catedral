@@ -39,7 +39,7 @@ export default function RootLayout({ children }) {
         <CurrencyProvider>
           <CartProvider>
             <Navbar />
-            <main className="max-w-7xl mx-auto px-4 py-10">
+            <main className="min-h-screen">
               <PageTransition>{children}</PageTransition>
             </main>
 

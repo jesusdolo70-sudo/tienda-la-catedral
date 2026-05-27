@@ -196,7 +196,7 @@ export default function ProductoPage() {
     : producto.imagen?.startsWith('http') ? [producto.imagen] : [];
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto px-4 py-10">
       <button
         onClick={() => router.back()}
         className="flex items-center gap-2 font-raleway text-xs tracking-widest uppercase mb-10 transition-colors"

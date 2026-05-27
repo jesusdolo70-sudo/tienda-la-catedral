@@ -90,7 +90,7 @@ export default function SeguimientoPedido() {
   const flujoIdx  = FLUJO.findIndex(e => e.key === pedido.estado);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pb-20">
+    <div className="max-w-2xl mx-auto px-4 pt-10 pb-20">
       {/* Back */}
       <Link
         href="/"

@@ -176,7 +176,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div style={{ minHeight: '60vh' }}>
+    <div className="max-w-7xl mx-auto px-4 py-10" style={{ minHeight: '60vh' }}>
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
